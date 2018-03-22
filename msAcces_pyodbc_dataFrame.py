@@ -77,7 +77,7 @@ for dict_tbl in list_dict_tbl:
 
 ## Sampling data
 # Retrive column name
-tbl_idx = 3
+tbl_idx = 2
 crsr.execute("select * from " + list_dict_tbl[tbl_idx]['name'])
 columns = [column[0] for column in crsr.description]
 
@@ -87,10 +87,32 @@ crsr.execute("select * from " + list_dict_tbl[tbl_idx]['name'])
 row = crsr.fetchone()
 while row is not None:
     list_row.append(row)
-    crsr.skip(10)  # skip 10 parts = sampel 10% of data
+    crsr.skip(10)  # skip 10 parts = sample 10% of data
     row = crsr.fetchone()
 
 # convert list of row to dataframe with column names
 df = pd.DataFrame([tuple(t) for t in list_row], columns = columns)
 
+# View Sample data
+df.head()
+
+# save dataframe
+os.chdir("C:\\Users\\Thanakrit.B\\Documents\\Python\\Data sanitization")
+df.to_pickle('mis_cc_2018_sample.pkl')
+
+# close connection
 cnxn.close()
+
+## Exploratory Data analysis
+
+import os
+import pandas as pd
+from matplotlib import pyplot as plt
+import seaborn as sns
+
+os.chdir("C:\\Users\\Thanakrit.B\\Documents\\Python\\Data sanitization")
+df = pd.read_pickle('mis_cc_2018_sample.pkl')
+
+df.head()
+sns.lmplot(data = df, x = 'Month', y = 'Monthly_Salary')
+sns.boxplot(data = df['Monthly_Salary'].groupby(['Month']))
