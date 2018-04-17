@@ -17,7 +17,7 @@ num_core = mp.cpu_count()
 print('This cpu has', num_core, 'core(s) available for use')
 
 # list of file start with MIS
-mis_files = [x for x in os.listdir('../temp_csv') if x.startswith('MIS')]
+mis_files = [x for x in os.listdir(os.path.join('..','temp_csv')) if x.startswith('MIS')]
 
 ## keep old stdio config, divert all print to var 'result'
 
@@ -29,10 +29,10 @@ sys.stdout = result
 
 for file in mis_files:
     old_dir = os.getcwd()
-    os.chdir('../temp_csv')
-    
+    os.chdir(os.path.join('..', 'temp_csv'))
+
     # count row num of csv file, define chunk size by 10%
-    row_count = sum(1 for line in open(file))
+    row_count = sum(1 for line in open(file, 'rt', encoding = 'utf-8'))
     chunk_no = 10
     chunk_size = row_count // chunk_no
 
@@ -40,7 +40,7 @@ for file in mis_files:
     print(file, 'have', row_count, 'rows')
 
     # define column to be force dtype , to be summarized by Month
-    if file.find('CC') == -1:  
+    if file.find('CC') == -1:
         # for mis_fl, mis_rl
         force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,\
            'ZipCode':object, 'Month':object, 'Application_ID':object,\
@@ -62,7 +62,7 @@ for file in mis_files:
     # count by Month
     for col in column_count_by_month:
          print('Count of', col, 'by Month')
-         print(df.groupby('Month')[col].count(), '\n')    
+         print(df.groupby('Month')[col].count(), '\n')
     # avg by Month
     for col in column_mean_by_month:
          print('Average of', col, 'by Month')

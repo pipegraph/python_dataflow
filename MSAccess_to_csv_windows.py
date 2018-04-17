@@ -56,7 +56,8 @@ try:
             filename = table.replace(" ","_") + ".csv"
             print("Dumping " + table)
             rows = cur.execute("SELECT * FROM " + table)
-            with open(filename, 'w', encoding = 'utf-8') as csvfile:
+            # specify newline = '', no extra \r before \r\n in line ending
+            with open(filename, 'w', newline = '', encoding = 'utf-8') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow([x[0] for x in cur.description])
                 for row in rows:
