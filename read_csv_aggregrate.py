@@ -21,9 +21,9 @@ mis_files = [x for x in os.listdir(os.path.join('..','temp_csv')) if x.startswit
 
 ## keep old stdio config, divert all print to var 'result'
 
-old_stdout = sys.stdout
-result = StringIO()
-sys.stdout = result
+#old_stdout = sys.stdout
+#result = StringIO()
+#sys.stdout = result
 
 ## Show each file, row num & summarizing
 
@@ -44,7 +44,9 @@ for file in mis_files:
         # for mis_fl, mis_rl
         force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,\
            'ZipCode':object, 'Month':object, 'Application_ID':object,\
-           'Criteria_Code':object, 'Occupation_Code':object}
+           'Criteria_Code':object, 'Occupation_Code':object, \
+           'Criteria_Code_C':object, 'Result_Description':object}
+        parse_date_col = ['DOB', 'CLOSE_DATE']
         column_count_by_month = ['Application_ID']
         column_mean_by_month = ['Approve_Amount', 'Money_Transfer', 'Monthly_Salary']
     else:
@@ -52,12 +54,13 @@ for file in mis_files:
         force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,\
                    'ZipCode':object, 'Month':object, 'Application_ID':object,\
                    'Criteria_Code':object, 'Occupation_Code':object,\
-                   'Criteria_Code_P':object, 'Criteria_Code_C':object}
+                   'Criteria_Code_C':object, 'Result_Description':object}
+        parse_date_col = ['DOB']
         column_count_by_month = ['Application_ID']
         column_mean_by_month = ['Approve_Amount', 'Monthly_Salary']
 
     # read data
-    df = pd.read_csv(file, parse_dates = ['DOB'], dtype = force_dtype)
+    df = pd.read_csv(file, parse_dates = parse_date_col, dtype = force_dtype)
 
     # count by Month
     for col in column_count_by_month:
@@ -69,8 +72,8 @@ for file in mis_files:
          print(df.groupby('Month')[col].mean(), '\n')
 
 # reversed stdout to original output
-sys.stdout = old_stdout
+#sys.stdout = old_stdout
 # retrive result as string
-result_str = result.getvalue()
+#result_str = result.getvalue()
 # change back to original directory
 os.chdir(old_dir)
