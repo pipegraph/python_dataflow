@@ -28,7 +28,7 @@ dict_driver_param = {'{}':'Need to install MS Access driver.',
 print('Found driver : ' + driver_param + '\n' + dict_driver_param[driver_param])
 
 # create connection string
-DB = 'C:\\Users\\Thanakrit.B\\Downloads\\OSS DataSales 201802.mdb'
+DB = 'C:\\Users\\Thanakrit.B\\Downloads\\OSS DataSales 201803.mdb'
 conn_str = (
     r'DRIVER=' + driver_param + ';'
     r'DBQ='+ DB +';'
