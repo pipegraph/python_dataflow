@@ -10,7 +10,7 @@ import sqlalchemy
 import pandas as pd
 
 # create engine, connection to mysql server
-eng = sqlalchemy.create_engine('mysql+pymysql://root:**********@localhost/ktc?charset=utf8')
+eng = sqlalchemy.create_engine('mysql+pymysql://root:dan1255599@localhost/ktc?charset=utf8')
 con = eng.connect()
 
 # list of file start with MIS
@@ -41,6 +41,9 @@ for file in mis_files:
     df = pd.read_csv(file, parse_dates = parse_date_col, dtype = force_dtype)
     df.to_sql(con = con, name = file.split('.', 1)[0].lower(), if_exists = 'replace')
 
+"""
+Phase 2 : Change to DataAllType to SSA master
+
 ## read sales data
 sales_data_files = [x for x in os.listdir('../temp_csv') if x.startswith('Data')]
 # dtype for sales data
@@ -48,3 +51,16 @@ for file in sales_data_files:
     force_dtype = {'TL_Code':object, 'Agent_Code':object, 'ProvinceCode':object}
     df = pd.read_csv(file, parse_dates = ['OpenDate'], dtype = force_dtype)
     df.to_sql(con = con, name = file.split('.', 1)[0].lower(), if_exists = 'replace')
+"""
+
+"""
+Phase 3 : Migrate AppControl Report
+
+## read app control data
+app_control_data_files = [x for x in os.listdir('../temp_csv') if x.startswith('App')]
+# dtype for sales data
+for file in app_control_data_files:
+    force_dtype = {'TL_Code':object, 'Agent_Code':object, 'ProvinceCode':object}
+    df = pd.read_csv(file, parse_dates = ['OpenDate'], dtype = force_dtype)
+    df.to_sql(con = con, name = file.split('.', 1)[0].lower(), if_exists = 'replace')
+"""
