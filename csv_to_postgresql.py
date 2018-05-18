@@ -5,25 +5,6 @@ Created on Mon Apr 16 14:45:49 2018
 
 @author: Danny
 """
-"""
-import psycopg2 as pg
-
-con = pg.connect('dbname=ktc user=postgres password=dan1255599')
-
-cur = con.cursor()
-
-cur.execute('create table test (id serial primary key, num integer, data varchar);')
-
-cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (100, "abc'def"))
-
-cur.execute('select * from test;')
-
-cur.fetchone()
-
-con.commit()
-cur.close()
-con.close()
-"""
 import os
 import sqlalchemy
 import pandas as pd
@@ -43,19 +24,22 @@ for file in mis_files:
     # define column to be force dtype , to be summarized by Month
     if file.find('CC') == -1:
         # for mis_fl, mis_rl
-        force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,\
-           'ZipCode':object, 'Month':object, 'Application_ID':object,\
-           'Criteria_Code':object, 'Occupation_Code':object, \
-           'Criteria_Code_C':object, 'Result_Description':object}
-        parse_date_col = ['DOB', 'CLOSE_DATE']
+        force_dtype = {'amsup':object, 'tl_code':object, 'agent_code':object,\
+           'zipcode':object, 'month':object, 'application_id':object,\
+           'criteria_code':object, 'occupation_code':object, \
+           'criteria_code_c':object, 'result_description':object}
+        parse_date_col = ['dob', 'close_date']
     else:
         # for mis_cc
-        force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,\
-                   'ZipCode':object, 'Month':object, 'Application_ID':object,\
-                   'Criteria_Code':object, 'Occupation_Code':object,\
-                   'Criteria_Code_C':object, 'Result_Description':object}
-        parse_date_col = ['DOB']
+        force_dtype = {'amsup':object, 'tl_code':object, 'agent_code':object,\
+                   'zipcode':object, 'month':object, 'application_id':object,\
+                   'criteria_code':object, 'occupation_code':object,\
+                   'criteria_code_c':object, 'result_description':object}
+        parse_date_col = ['dob']
 
     # read csv file as dataframe
+    print('Reading', file, '\n')
     df = pd.read_csv(file, parse_dates = parse_date_col, dtype = force_dtype)
+    # write back to dbms
+    print('Dumping', file, 'to Postgre\n')
     df.to_sql(con = con, name = file.split('.', 1)[0].lower(), if_exists = 'replace')
