@@ -26,6 +26,7 @@ mis_files = [x for x in os.listdir(os.path.join('..','temp_csv')) if x.startswit
 #sys.stdout = result
 
 ## Show each file, row num & summarizing
+print("Sampling data from file : ", mis_files)
 
 for file in mis_files:
     old_dir = os.getcwd()
@@ -42,22 +43,22 @@ for file in mis_files:
     # define column to be force dtype , to be summarized by Month
     if file.find('CC') == -1:
         # for mis_fl, mis_rl
-        force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,\
-           'ZipCode':object, 'Month':object, 'Application_ID':object,\
-           'Criteria_Code':object, 'Occupation_Code':object, \
-           'Criteria_Code_C':object, 'Result_Description':object}
-        parse_date_col = ['DOB', 'CLOSE_DATE']
-        column_count_by_month = ['Application_ID']
-        column_mean_by_month = ['Approve_Amount', 'Money_Transfer', 'Monthly_Salary']
+        force_dtype = {'amsup':object, 'tl_code':object, 'agent_code':object,\
+           'zipcode':object, 'month':object, 'application_id':object,\
+           'criteria_code':object, 'occupation_code':object, \
+           'criteria_code_c':object, 'result_description':object}
+        parse_date_col = ['dob', 'close_date']
+        column_count_by_month = ['application_id']
+        column_mean_by_month = ['approve_amount', 'money_transfer', 'monthly_salary']
     else:
         # for mis_cc
-        force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,\
-                   'ZipCode':object, 'Month':object, 'Application_ID':object,\
-                   'Criteria_Code':object, 'Occupation_Code':object,\
-                   'Criteria_Code_C':object, 'Result_Description':object}
-        parse_date_col = ['DOB']
-        column_count_by_month = ['Application_ID']
-        column_mean_by_month = ['Approve_Amount', 'Monthly_Salary']
+        force_dtype = {'amsup':object, 'tl_code':object, 'agent_code':object,\
+                   'zipcode':object, 'month':object, 'application_id':object,\
+                   'criteria_code':object, 'occupation_code':object,\
+                   'criteria_code_c':object, 'result_description':object}
+        parse_date_col = ['dob']
+        column_count_by_month = ['application_id']
+        column_mean_by_month = ['approve_amount', 'monthly_salary']
 
     # read data
     df = pd.read_csv(file, parse_dates = parse_date_col, dtype = force_dtype)
@@ -65,11 +66,11 @@ for file in mis_files:
     # count by Month
     for col in column_count_by_month:
          print('Count of', col, 'by Month')
-         print(df.groupby('Month')[col].count(), '\n')
+         print(df.groupby('month')[col].count(), '\n')
     # avg by Month
     for col in column_mean_by_month:
          print('Average of', col, 'by Month')
-         print(df.groupby('Month')[col].mean(), '\n')
+         print(df.groupby('month')[col].mean(), '\n')
 
 # reversed stdout to original output
 #sys.stdout = old_stdout
