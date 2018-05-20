@@ -39,3 +39,25 @@ app_by_mth.plot()
 ts = app.groupby(['receive_date', 'bundle']).agg('count')
 sns.set()
 ts['userid'].unstack().plot()
+
+# scatterplot
+date_bundle = ts['userid'].unstack()
+sns.lmplot(data = date_bundle, x = 'N', y = 'Y')
+
+# focus on source code like oss
+oss = app[app['source_code'].str.startswith('O')]
+ts = oss.groupby(['receive_date', 'bundle']).agg('count')
+date_bundle = ts['userid'].unstack()
+sns.lmplot(data = date_bundle, x = 'N', y = 'Y')
+
+# filter before & after
+before = date_bundle.loc[:'2017-07-31']
+after = date_bundle.loc['2017-08-01':]
+
+from scipy import stats
+
+sns.lmplot(data = before, x = 'N', y = 'Y')
+print('Pearson r : {:.5f}'.format(stats.pearsonr(before['N'], before['Y'])[0]))
+sns.lmplot(data = after, x = 'N', y = 'Y')
+print('Pearson r : {:.5f}'.format(stats.pearsonr(after['N'], after['Y'])[0]))
+
