@@ -29,7 +29,7 @@ records = io.read('/Users/Danny/Share Win7/2017OSSDatabase.accdb')
 
 import jaydebeapi
 
-# Initiate Java runtiome file location 
+# Initiate Java runtiome file location
 
 ucanaccess_jars = [
         "/Users/Danny/Documents/UCanAccess-4.0.2-bin/ucanaccess-4.0.2.jar",
@@ -65,3 +65,4 @@ for row in crsr.fetchall():
 crsr.close()
 # Close connection
 cnxn.close()
+def test:
