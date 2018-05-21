@@ -22,20 +22,44 @@ for file in mis_files:
     os.chdir('../temp_csv')
 
     # define column to be force dtype , to be summarized by Month
-    if file.find('CC') == -1:
-        # for mis_fl, mis_rl
-        force_dtype = {'amsup':object, 'tl_code':object, 'agent_code':object,\
-           'zipcode':object, 'month':object, 'application_id':object,\
-           'criteria_code':object, 'occupation_code':object, \
-           'criteria_code_c':object, 'result_description':object}
-        parse_date_col = ['dob', 'close_date']
+
+    # 2018 data type
+    if file.find('2018'):
+        # if file name contain 'CC'
+        if file.find('CC'):
+            # define dtype for mis_cc
+            force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,
+                           'ZipCode':object, 'Month':object, 'Application_ID':object,
+                           'Criteria_Code':object, 'Occupation_Code':object,
+                           'Criteria_Code_C':object, 'Result_Description':object}
+            parse_date_col = ['DOB']
+        # if file name not contain 'CC'
+        else:
+            # define dtype for rl, fl
+            force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,
+                           'ZipCode':object, 'Month':object, 'Application_ID':object,
+                           'Criteria_Code':object, 'Occupation_Code':object,
+                           'Criteria_Code_C':object, 'Result_Description':object}
+            parse_date_col = ['DOB', 'CLOSE_DATE']
+
+    # 2017 data type
     else:
-        # for mis_cc
-        force_dtype = {'amsup':object, 'tl_code':object, 'agent_code':object,\
-                   'zipcode':object, 'month':object, 'application_id':object,\
-                   'criteria_code':object, 'occupation_code':object,\
-                   'criteria_code_c':object, 'result_description':object}
-        parse_date_col = ['dob']
+        if file.find('CC'):
+            # define dtype for mis_cc
+            force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,
+                           'ZipCode':object, 'Month':object, 'Application_ID':object,
+                           'Criteria_Code':object, 'Occupation_Code':object,
+                           'Criteria_Code_C':object, 'Result_Description':object}
+            parse_date_col = ['DOB']
+        # if file name not contain 'CC'
+        else:
+            # define dtype for rl, fl
+            force_dtype = {'AMSup':object, 'TL_Code':object, 'Agent_Code':object,
+                           'ZipCode':object, 'Month':object, 'Application_ID':object,
+                           'Criteria_Code':object, 'Occupation_Code':object,
+                           'Criteria_Code_C':object, 'Result_Description':object}
+            parse_date_col = ['DOB', 'CLOSE_DATE']
+
 
     # read csv file as dataframe
     print('Reading', file, '\n')
@@ -43,3 +67,7 @@ for file in mis_files:
     # write back to dbms
     print('Dumping', file, 'to Postgre\n')
     df.to_sql(con = con, name = file.split('.', 1)[0].lower(), if_exists = 'replace')
+
+# close connection & dispose engine
+con.close()
+eng.dispose()
