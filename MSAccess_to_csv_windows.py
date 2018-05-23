@@ -1,7 +1,8 @@
 import os
 import pyodbc
 import csv
-
+from tkinter import *
+from tkinter.filedialog import askopenfilename
 """
 Look for MSAccess driver install in windows
 'Microsoft Access Driver (*.mdb)' : 32-bits 'Jet' driver, default with windows
@@ -28,7 +29,11 @@ dict_driver_param = {'{}':'Need to install MS Access driver.',
 print('Found driver : ' + driver_param + '\n' + dict_driver_param[driver_param])
 
 # create connection string
-DB = 'C:\\Users\\Thanakrit.B\\Downloads\\OSS DataSales 201803.mdb'
+root = Tk()
+root.withdraw()
+DB = askopenfilename()
+root.destroy()
+# DB = 'C:\\Users\\Thanakrit.B\\Downloads\\OSS DataSales 201803.mdb'
 conn_str = (
     r'DRIVER=' + driver_param + ';'
     r'DBQ='+ DB +';'
@@ -49,17 +54,28 @@ try:
         print('temp_csv dir created')
 
     # Export each table to temp_csv
-    os.chdir('..\\temp_csv')
+    os.chdir('temp_csv')
 
-    for table in tables[2:]:
+    for table in tables:
         if table != '':
             filename = table.replace(" ","_") + ".csv"
+
             print("Dumping " + table)
-            rows = cur.execute("SELECT * FROM " + table)
+            # retrive table
+            rows = cur.execute("SELECT * FROM " + "[" + table + "]")
+
+            # convert column name to match postgresql
+            old_col_name = [desc[0] for desc in cur.description]
+            new_col_name = [c.strip().replace(' ', '_').replace('/', '_') for c in old_col_name]
+
             # specify newline = '', no extra \r before \r\n in line ending
             with open(filename, 'w', newline = '', encoding = 'utf-8') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow([x[0] for x in cur.description])
+
+                # write new_col_name
+                writer.writerow(new_col_name)
+
+                # write data
                 for row in rows:
                     writer.writerow(row)
 finally:
