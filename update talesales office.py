@@ -22,8 +22,9 @@ with con.cursor() as cur:
     print(tables)
 
 # Pandas read sql ; cannot fetch table
+table = 'SaleHis_Chang'
 
-df = pd.read_sql(r'SELECT * from Outsource_Dumy_Register', con = con)
+df = pd.read_sql(r'SELECT * from ' + table, con = con)
 con.close()
 
 # check data & convert columns names
@@ -50,4 +51,5 @@ tbl_list = pd.read_sql_query(sql, con = con)
 print(tbl_list)
 
 # write table to postgres
-df.to_sql(con = con, name = 'telesales_office_dummy', if_exists = 'replace')
+df.to_sql(con = con, name = table.lower() , if_exists = 'replace')
+con.close()
