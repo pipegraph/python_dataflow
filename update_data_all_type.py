@@ -1,13 +1,9 @@
 import os
 import pyodbc
 import csv
-from tkinter import *
-from tkinter.filedialog import askopenfilename
+
 """
-Look for MSAccess driver install in windows
-'Microsoft Access Driver (*.mdb)' : 32-bits 'Jet' driver, default with windows
-'Microsoft Access Driver (*.mdb, *.accdb)' : 32-bits or 64-bits 'ACE' driver, come with MS Office
-, could download from https://www.microsoft.com/en-US/download/details.aspx?id=13255
+Exporting from MS Access as .csv
 """
 
 # list all driver available
@@ -29,40 +25,30 @@ dict_driver_param = {'{}':'Need to install MS Access driver.',
 print('Found driver : ' + driver_param + '\n' + dict_driver_param[driver_param])
 
 # create connection string
-root = Tk()
-root.withdraw()
-DB = askopenfilename()
-root.destroy()
-# DB = 'C:\\Users\\Thanakrit.B\\Downloads\\OSS DataSales 201803.mdb'
+DB = """//10.24.9.41\Outsource_Sales_Register\DataBase\SalesData.mdb"""
 conn_str = (
     r'DRIVER=' + driver_param + ';'
     r'DBQ='+ DB +';'
     )
 # Initate Connection
 con = pyodbc.connect(conn_str)
-try:
-    with con.cursor() as cur:
-        # list all tables
-        tables = [x.table_name for x in cur.tables(tableType='TABLE')]
-        print('List of all tables in DB')
-        print(tables)
-
-    # Create temp csv directory for store files
-    try:
-        os.mkdir('..\\temp_csv')
-    except:
-        print('temp_csv dir created')
+with con.cursor() as cur:
+    # list all tables
+    views = [x.table_name for x in cur.tables(tableType='VIEW')]
+    print('List of all tables in DB')
+    print(views)
 
     # Export each table to temp_csv
-    os.chdir('temp_csv')
+    os.chdir(r'C:\Users\Thanakrit.B\Downloads\temp_csv')
+    views = ['DataAllType']
 
-    for table in tables:
-        if table != '':
-            filename = table.replace(" ","_") + ".csv"
+    for view in views:
+        if view != '':
+            filename = view.replace(" ","_") + ".csv"
 
-            print("Dumping " + table)
+            print("Dumping " + view)
             # retrive table
-            rows = cur.execute("SELECT * FROM " + "[" + table + "]")
+            rows = cur.execute("SELECT * FROM " + "[" + view + "]")
 
             # convert column name to match postgresql
             old_col_name = [desc[0] for desc in cur.description]
@@ -78,5 +64,8 @@ try:
                 # write data
                 for row in rows:
                     writer.writerow(row)
-finally:
-    con.close()
+con.close()
+
+"""
+Import to Postgre
+"""

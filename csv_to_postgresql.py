@@ -66,7 +66,7 @@ for file in mis_files:
     df = pd.read_csv(file, parse_dates = parse_date_col, dtype = force_dtype)
     # write back to dbms
     print('Dumping', file, 'to Postgre\n')
-    df.to_sql(con = con, name = file.split('.', 1)[0].lower(), if_exists = 'replace')
+    df.to_sql(con = con, name = file.split('.', 1)[0].lower(), if_exists = 'replace', index = False)
 
 # close connection & dispose engine
 con.close()

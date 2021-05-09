@@ -1,13 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 20 16:10:21 2018
+
+@author: thanakrit.b
+"""
 import os
 import pyodbc
-import csv
-from tkinter import *
-from tkinter.filedialog import askopenfilename
+
 """
-Look for MSAccess driver install in windows
-'Microsoft Access Driver (*.mdb)' : 32-bits 'Jet' driver, default with windows
-'Microsoft Access Driver (*.mdb, *.accdb)' : 32-bits or 64-bits 'ACE' driver, come with MS Office
-, could download from https://www.microsoft.com/en-US/download/details.aspx?id=13255
+Read and check mis data from ms access
 """
 
 # list all driver available
@@ -29,40 +30,39 @@ dict_driver_param = {'{}':'Need to install MS Access driver.',
 print('Found driver : ' + driver_param + '\n' + dict_driver_param[driver_param])
 
 # create connection string
-root = Tk()
-root.withdraw()
-DB = askopenfilename()
-root.destroy()
-# DB = 'C:\\Users\\Thanakrit.B\\Downloads\\OSS DataSales 201803.mdb'
+DB = """C:\\Users\\Thanakrit.B\\Downloads\\Outsource1805.mdb"""
 conn_str = (
     r'DRIVER=' + driver_param + ';'
     r'DBQ='+ DB +';'
     )
+
 # Initate Connection
 con = pyodbc.connect(conn_str)
-try:
-    with con.cursor() as cur:
-        # list all tables
-        tables = [x.table_name for x in cur.tables(tableType='TABLE')]
-        print('List of all tables in DB')
-        print(tables)
+cur = con.
 
-    # Create temp csv directory for store files
-    try:
-        os.mkdir('..\\temp_csv')
-    except:
-        print('temp_csv dir created')
+# list all table from ms access
 
-    # Export each table to temp_csv
-    os.chdir('temp_csv')
 
-    for table in tables:
+
+
+
+
+
+with con.cursor() as cur:
+    # list all tables
+    tables = [x.table_name for x in cur.tables(tableType='TABLE')]
+    print('List of all tables in DB')
+    print(tables)
+
+    # select mis tables only
+    mis_tables = [x for x in tables if x.startswith('MIS')]
+    print(mis_tables)
+
+    for table in mis_tables:
         if table != '':
-            filename = table.replace(" ","_") + ".csv"
-
-            print("Dumping " + table)
+            print("Loading " + table)
             # retrive table
-            rows = cur.execute("SELECT * FROM " + "[" + table + "]")
+
 
             # convert column name to match postgresql
             old_col_name = [desc[0] for desc in cur.description]
@@ -78,5 +78,7 @@ try:
                 # write data
                 for row in rows:
                     writer.writerow(row)
-finally:
-    con.close()
+con.close()
+
+"""
+Import to Postgre

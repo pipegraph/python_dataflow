@@ -1,0 +1,83 @@
+drop view if exists view_sale_status_n_open_react;
+
+/*****
+* Version 1 : monthly sales status update by day
+******/
+
+create view view_sale_status_n_open_react as
+
+select a.*,
+
+-- mark flag open, react, n
+case 
+	when a.open_date = a.update_date 
+	and date_trunc('month', a.update_date)::date = date_trunc('month', month)::date
+	and a.itemno = 1 then 1
+	else 0
+end as "open_flag",
+case
+	when a.open_date = a.update_date 
+	and date_trunc('month', a.update_date)::date = date_trunc('month', a.month)::date
+	and a.itemno > 1 then 1
+	else 0
+end as "react_flag",
+case
+	when a.status = 'N' then 1
+	else 0
+end as "n_flag"
+
+from (select z.*
+
+	  -- mapping cascade sales history by yyyymm index
+	  from (select y.*, x.*
+			
+			-- cross join yyyymm index with sale history
+			from (select *,
+				  -- create lead update and lag update date
+				  coalesce(lag(update_date, 1) over (partition by agent_code order by itemno desc), now()::date) as lag_update_date,
+				  coalesce(lead(update_date, 1) over (partition by agent_code order by itemno desc), open_date) as lead_update_date
+
+				  from mat_view_sale_hist
+				  order by agent_code, itemno
+				 ) as x cross join yyyymm as y
+			-- end cross join
+			
+		   ) as z
+	  where z.month < z.lag_update_date 
+	  and z.lead_update_date < z.month 
+	  and z.update_date <= z.month
+	  order by agent_code, itemno
+	 ) as a
+	 -- end mapping cascade
+
+
+
+/*****
+* NOT USED
+* Version 2: monthly sales status update by month
+*****/
+/*
+select z.*
+from (select y.*, x.*
+	  from (select *,
+			-- lag and lead update date
+			coalesce(lag(update_date, 1) over (partition by agent_code order by itemno desc), now()::date) as lag_update_date,
+			coalesce(lead(update_date, 1) over (partition by agent_code order by itemno desc), open_date) as lead_update_date
+			
+			-- lag and lead update by month
+			,
+			date_trunc('month', coalesce(lag(update_date, 1) over (partition by agent_code order by itemno desc), now()::date))::date as lag_update_mth,
+			date_trunc('month', coalesce(lead(update_date, 1) over (partition by agent_code order by itemno desc), open_date))::date as lead_update_mth
+			
+			from mat_view_sale_hist
+			order by agent_code, itemno
+		   ) as x cross join yyyymm as y
+	 ) as z
+-- where z.month < z.lag_update_date and z.lead_update_date < z.month and z.update_date <= z.month
+where date_trunc('month', z.month)::date <= z.lag_update_mth 
+and z.lead_update_date <= date_trunc('month', z.month)::date 
+and z.update_date <= date_trunc('month', z.month)::date
+and agent_code = '3171611'
+order by agent_code, itemno
+;
+*/
